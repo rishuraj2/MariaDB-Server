@@ -1,0 +1,39 @@
+services:
+  mariadb:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    image: mariadb-server/database:0.0.1
+    container_name: mariadb-server_database
+    mem_limit: 256m
+    restart: unless-stopped
+    ports:
+      - "36010:3306"
+    environment:
+      - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MARIADB_DATABASE=maria_db
+      - MARIADB_USER=maria_user
+      - MARIADB_PASSWORD_FILE=/run/secrets/db_password
+    secrets:
+      - db_root_password
+      - db_password
+    volumes:
+      - mariadb:/var/lib/mysql
+    networks:
+      - mariadb-server-network
+    
+    
+
+secrets:
+  db_root_password:
+    file: ./secrets/database/db_root_password.txt
+  db_password:
+    file: ./secrets/database/db_password.txt
+
+networks:
+  mariadb-server-network:
+    name: mariadb-server-network
+    driver: bridge
+
+volumes:
+  mariadb:

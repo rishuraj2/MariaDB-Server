@@ -7,9 +7,10 @@ After cloning the repository:
      secrets/
         database/
             db_password.txt
+                   +
             db_root_password.txt
-  2. Add a single line text to each of these files. Ex. db_password.txt -> mariadb_password, db_root_password.txt -> mariadb_admin
-  3. Save it and run
+  3. Add a single line text to each of these files. Ex. db_password.txt -> mariadb_password, db_root_password.txt -> mariadb_admin
+  4. Save it and run
 ```bash
 docker compose up --build
 ```

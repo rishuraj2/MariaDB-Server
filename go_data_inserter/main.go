@@ -1,27 +1,30 @@
 package main
 
 import (
-	"log"
-
-	"github.com/gin-gonic/gin"
+	"go_data_inserter/insertionlogic"
+	"go_data_inserter/models"
 	"go_data_inserter/utility"
+	"log"
+	"time"
 )
 
-const (
-	PORT = ":8081"
+var (
 	schemaType = "public"
-	tableName = "batch_inputs"
+	tableName  = "batch_inputs"
+	timeKeeper = time.Now()
+	sequence   = 0
 )
 
 func main() {
-	db, err := utility.ConnectDb();
-	defer db.Close()
+	db, err := utility.ConnectDb()
 	if err != nil {
 		log.Fatalf("Error in connection to database. Check connection string. err: %s", err)
+		return
 	}
+	defer db.Close()
 
 	if err := utility.CheckDbConnection(db); err != nil {
-		log.Fatalf("Failed to connect to database: ", err)
+		log.Fatalf("Failed to connect to database: %s", err)
 		return
 	}
 
@@ -30,4 +33,13 @@ func main() {
 	} else {
 		log.Fatalf("Failed to find table %s! Check 'Schema Type' and 'Table Name'", tableName)
 	}
+
+	dataChan := make(chan models.DataToBeInserted, 100)
+	go insertionlogic.DatabaseWorker(db, dataChan)
+
+	for {
+		dataChan <- insertionlogic.GenerateData(&sequence, &timeKeeper)
+		time.Sleep(1 * time.Second)
+	}
+
 }

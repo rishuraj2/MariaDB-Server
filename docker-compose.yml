@@ -21,8 +21,6 @@ services:
       - mariadb:/var/lib/mysql
     networks:
       - mariadb-server-network
-    
-    
 
 secrets:
   db_root_password:
